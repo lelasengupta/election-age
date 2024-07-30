@@ -1,0 +1,24 @@
+---
+title: "Longevity after Elections"
+author: "Lela Sengupta"
+format: html
+execute:
+  echo: false
+---
+
+```{r}
+#|label: setup
+#|message: false
+library(tidyverse)
+library(primer.data)
+library(brms)
+library(tidybayes)
+library(gtsummary)
+```
+
+```{r}
+#|label: data_load
+
+
+```
+
