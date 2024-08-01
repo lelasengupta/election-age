@@ -9,6 +9,7 @@ execute:
 ```{r}
 #|label: setup
 #|message: false
+#|warning: false
 library(tidyverse)
 library(primer.data)
 library(brms)
@@ -18,7 +19,87 @@ library(gtsummary)
 
 ```{r}
 #|label: data_load
+#|message: false
 
+x <- governors |> 
+  #selecting 4 columns that connect with the model
+  select(death_age, election_age, win_margin, party, sex) |> 
+  #make new column to say win if win margin > 0, lose if not
+  mutate(treatment = ifelse(win_margin > 0, "win", "lose")) |> 
+  #keeping candidates who had a win margin of less than 5
+  filter(abs(win_margin) < 5) 
+ 
 
 ```
+
+```{r}
+#|label: model
+#|cache: true
+
+fit_elec <- brm(formula = death_age ~ treatment + party + win_margin,
+     data = x,
+     family = gaussian(),
+     refresh = 0,
+     silent = 2,
+     seed = 23
+     )
+```
+
+$$death\_age_{i} = \beta_{0} + \beta_{1} treatment_i + \beta_{2}win\_margin_i + \beta_{3}party_i + \epsilon_{i}$$
+
+```{r}
+#| warning: false
+tbl_regression(fit_elec)
+```
+
+
+
+## Wisdom
+
+subject: longevity
+
+broad q: election results and age
+
+specific q: how long will preceptor live if he wins the election for mayor of newton? 
+
+timeframe: in the near future (2024-2050)
+
+preceptor table:
+- units: candidates for mayor
+- potential outcomes: number of years alive after election,
+number of years alive after losing election (lived_after)
+- covariates: sex (sex), age when elected (election_age)
+- treatment: won or lost election (win_margin)
+
+model type: gaussian
+
+validity:
+- winning a municipal election is different from winning a state election
+
+## Justice
+population table:
+- years: 1945-2050 (when candidates run for election)
+- units: any candidate running for a political position in the US
+- potential outcomes: number of years alive after election,
+number of years alive after losing election (lived_after)
+- covariates: sex (sex), age when elected (election_age)
+- treatment: won or lost election (win_margin)
+
+stability:
+- life expectancy has changed since our data was collected
+
+representativeness:
+- we want data for mayoral elections, which are different from state elections
+- we have less data for losing candidates than winning candidates
+
+unconfoundedness:
+- many covariates influence whether a candidate wins or loses an election, including those that cannot be manipulated (race, sex, and age are some examples) 
+
+##Courage
+- people who have larger win margins are more likely to have other variables confound their results
+
+models
+testing
+dgm
+
 
